@@ -1,20 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { campgroundSchema, reviewSchema } = require("../schemas.js");
-const ExpressError = require("../utils/expressError");
 const asyncWrap = require("../utils/asyncWrap");
 const Campground = require("../models/campground");
-const { isLoggedIn } = require("../middleware");
-
-const validateCampground = (req, res, next) => {
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(msg, 400);
-    } else {
-        next();
-    }
-};
+const { isLoggedIn, isAuthor, validateCampground } = require("../middleware");
+const { populate } = require("../models/campground");
 
 router.get(
     "/",
@@ -30,6 +19,7 @@ router.post(
     validateCampground,
     asyncWrap(async (req, res, next) => {
         const campground = new Campground(req.body.campground);
+        campground.author = req.user._id;
         await campground.save();
         req.flash("success", "Successfully made a new campground");
         res.redirect(`/campgrounds/${campground._id}`);
@@ -43,9 +33,9 @@ router.get("/new", isLoggedIn, (req, res) => {
 router.get(
     "/:id",
     asyncWrap(async (req, res) => {
-        const campground = await Campground.findById(req.params.id).populate(
-            "reviews"
-        );
+        const campground = await Campground.findById(req.params.id)
+            .populate({ path: "reviews", populate: { path: "author" } })
+            .populate("author");
         if (!campground) {
             req.flash("error", "Campground Not Found");
             return res.redirect("/campgrounds");
@@ -57,8 +47,9 @@ router.get(
 router.get(
     "/:id/edit",
     isLoggedIn,
+    isAuthor,
     asyncWrap(async (req, res) => {
-        const campground = await Campground.findById(req.params.id);
+        const campground = await Campground.findById(req.params._id);
         if (!campground) {
             req.flash("error", "Campground Not Found");
             return res.redirect("/campgrounds");
@@ -70,6 +61,7 @@ router.get(
 router.put(
     "/:id",
     isLoggedIn,
+    isAuthor,
     validateCampground,
     asyncWrap(async (req, res) => {
         const { id } = req.params;
@@ -84,6 +76,7 @@ router.put(
 router.delete(
     "/:id",
     isLoggedIn,
+    isAuthor,
     asyncWrap(async (req, res) => {
         const { id } = req.params;
         await Campground.findByIdAndDelete(id);
