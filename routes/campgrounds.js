@@ -1,15 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const asyncWrap = require("../utils/asyncWrap");
-const Campground = require("../models/campground");
 const { isLoggedIn, isAuthor, validateCampground } = require("../middleware");
 const campgrounds = require("../controllers/campgrounds");
+const multer = require("multer");
+const { storage } = require("../cloudinary");
+const upload = multer({ storage });
 
 router
     .route("/")
     .get(asyncWrap(campgrounds.index))
     .post(
         isLoggedIn,
+        upload.array("image"),
         validateCampground,
         asyncWrap(campgrounds.createCampground)
     );
