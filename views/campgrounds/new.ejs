@@ -32,20 +32,17 @@
                 />
                 <div class="valid-feedback">Looks Good!!!</div>
             </div>
-            <input type="file" name="image" id="" multiple />
-            <!--
             <div class="mb-3">
-                <label class="form-label" for="image">Image URL</label>
-                <input
+                <label class="form-label" for="description">Description</label>
+                <textarea
                     class="form-control"
                     type="text"
-                    name="campground[image]"
-                    id="image"
+                    name="campground[description]"
+                    id="description"
                     required
-                />
+                ></textarea>
                 <div class="valid-feedback">Looks Good!!!</div>
             </div>
-            -->
             <div class="mb-3">
                 <label class="form-label" for="price">Campground Price</label>
                 <div class="input-group">
@@ -64,15 +61,18 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label" for="description">Description</label>
-                <textarea
-                    class="form-control"
-                    type="text"
-                    name="campground[description]"
-                    id="description"
-                    required
-                ></textarea>
-                <div class="valid-feedback">Looks Good!!!</div>
+                <label class="form-label" for="inputGroupFile02"
+                    >Upload Images</label
+                >
+                <div class="input-group mb-3">
+                    <input
+                        type="file"
+                        class="form-control"
+                        id="inputGroupFile02"
+                        name="image"
+                        multiple
+                    />
+                </div>
             </div>
             <div class="mb-3">
                 <button class="btn btn-success">Add Campground</button>
